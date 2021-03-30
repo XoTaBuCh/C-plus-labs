@@ -1,0 +1,2 @@
+D:\Учёба\ОАиП\8\set\Debug\set.exe
+D:\Учёба\ОАиП\8\set\Debug\set.pdb

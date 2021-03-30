@@ -29,8 +29,8 @@ private:
     size_t  size;
 public:
     Deque() {
-        Block<T> *block1 = new Block<T>;
-        Block<T> *block2 = new Block<T>(block1, block1);
+        Block<T>* block1 = new Block<T>;
+        Block<T>* block2 = new Block<T>(block1, block1);
         List.push_back(block1);
         List.push_back(block2);
         block1->pNext = block2;
@@ -43,7 +43,7 @@ public:
         return size;
     }
     void test() {
-        
+
     }
     void push_back(T key)
     {
@@ -56,7 +56,7 @@ public:
             rear = 1;
             if (front - rear <= 4) {
                 auto itVec = List.begin();
-                Block<T>* newBlock = new Block<T>(List[List.size()-1], List[0]->pNext);
+                Block<T>* newBlock = new Block<T>(List[List.size() - 1], List[0]->pNext);
                 newBlock->pPrev->pNext = newBlock;
                 newBlock->pNext->pPrev = newBlock;
                 List.insert(itVec, newBlock);
@@ -79,10 +79,45 @@ public:
         }
         size++;
     }
-    void push_front(T key)
+    /*void push_front(T key)
     {
         if (size == 0) {
             front = MAX_size * List.size() - 1;
+            rear = 0;
+            List[List.size() - 1]->block[MAX_size - 1] = key;
+        }
+        else if (front == 0) {
+            front = MAX_size * List.size() - 1;
+            if (front - rear <= 4) {
+                Block<T>* newBlock = new Block<T>(List[(rear - 1) / MAX_size], List[(rear - 1) / MAX_size]->pNext);
+                newBlock->pPrev->pNext = newBlock;
+                newBlock->pNext->pPrev = newBlock;
+                List.push_back(newBlock);
+                front += MAX_size;
+            }
+            List[front / MAX_size]->block[front % MAX_size] = key;
+        }
+        else {
+            if (front - 1 - rear <= 4 && front > rear) {
+                auto itVec = List.begin();
+                Block<T>* newBlock = new Block<T>(List[(rear - 1) / MAX_size], List[(rear - 1) / MAX_size]->pNext);
+                newBlock->pPrev->pNext = newBlock;
+                newBlock->pNext->pPrev = newBlock;
+                itVec += (rear / MAX_size + 1);
+                List.insert(itVec, newBlock);
+                front += MAX_size;
+            }
+            front--;
+            List[front / MAX_size]->block[front % MAX_size] = key;
+        }
+        size++;
+    }*/
+    void push_front(T key)
+    {
+        front--;
+        if (front<0) {
+            front = MAX_size * List.size() - 1;
+
             rear = 0;
             List[List.size() - 1]->block[MAX_size - 1] = key;
         }
@@ -120,7 +155,7 @@ public:
 int main()
 {
     Deque<int> dq;
-    
+
     dq.push_back(12);
     dq.push_back(13);
     dq.push_back(14);
