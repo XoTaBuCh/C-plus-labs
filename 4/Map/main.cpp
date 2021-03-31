@@ -46,9 +46,15 @@ private:
 		}
 		if (_node->data.first > _data.first) {
 			_node->pLeft = insert(_node->pLeft, _data);
+			if (_node->pLeft != nullptr) {
+				_node->pLeft->Parent = _node;
+			}
 		}
 		else if (_node->data.first < _data.first) {
 			_node->pRight = insert(_node->pRight, _data);
+			if (_node->pRight != nullptr) {
+				_node->pRight->Parent = _node;
+			}
 		}
 		else {
 			_node->data = _data;
@@ -83,8 +89,20 @@ private:
 		else if (_node->data.first < _key) {
 			_node->pRight = erase(_node->pRight, _key);
 		}
+		else if (_node->pLeft != nullptr && _node->pRight != nullptr) {
+			_node->data = min_node(_node->pRight)->data;
+			_node->pRight = erase(_node->pRight, _node->data.first);
+		}
 		else {
-			clear(_node);
+			if (_node->pLeft != nullptr) {
+				_node = _node->pLeft;
+			}
+			else if (_node->pRight != nullptr) {
+				_node = _node->pRight;
+			}
+			else {
+				_node = nullptr;
+			}
 			size--;
 		}
 		return _node;
@@ -117,10 +135,10 @@ private:
 		}
 		Node* temp_node;
 		if (_key <= _node->data.first) {
-			temp_node = next(_node->pLeft, _key);
+			temp_node = prev(_node->pLeft, _key);
 		}
 		else {
-			temp_node = next(_node->pRight, _key);
+			temp_node = prev(_node->pRight, _key);
 			if (temp_node == nullptr || temp_node->data.first >= _key) {
 				temp_node = _node;
 			}
@@ -158,6 +176,8 @@ public:
 	}
 	void Clear() {
 		clear(tree);
+		size = 0;
+		tree = new Node();
 	}
 	Value& operator[](Key _key) {
 		Node* temp_node = find(tree, _key);
@@ -192,7 +212,6 @@ public:
 	class IteratorMap : iterator<bidirectional_iterator_tag, pair<Key, Value>> {
 	private:
 		Node* ptr;
-		Node* tree;
 	public:
 		Node* max_node(Node* _node) {
 			return _node->pRight ? max_node(_node->pRight) : _node;
@@ -283,7 +302,10 @@ public:
 		return IteratorMap(min_node(tree));
 	}
 	IteratorMap end() {
-		return IteratorMap(max_node(tree));
+		Node* temp_node = new Node();
+		max_node(tree)->pRight = temp_node;
+		temp_node->Parent = max_node(tree);
+		return IteratorMap(temp_node);
 	}
 };
 template <typename Key>
