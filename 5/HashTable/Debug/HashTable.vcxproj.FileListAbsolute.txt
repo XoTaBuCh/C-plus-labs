@@ -1,0 +1,2 @@
+D:\Учёба\ОАиП\2 сем\5\HashTable\Debug\HashTable.exe
+D:\Учёба\ОАиП\2 сем\5\HashTable\Debug\HashTable.pdb
