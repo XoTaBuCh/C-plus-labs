@@ -1,0 +1,12 @@
+﻿  Mandelbrot.cpp
+D:\Учёба\ОАиП\2 сем\6\Mandelbrot\Mandelbrot.cpp(32,27): warning C4244: *=: преобразование "double" в "int", возможна потеря данных
+D:\Учёба\ОАиП\2 сем\6\Mandelbrot\Mandelbrot.cpp(41,27): warning C4244: /=: преобразование "double" в "int", возможна потеря данных
+D:\Учёба\ОАиП\2 сем\6\Mandelbrot\Mandelbrot.cpp(69,15): warning C4244: инициализация: преобразование "long double" в "int", возможна потеря данных
+D:\Учёба\ОАиП\2 сем\6\Mandelbrot\Mandelbrot.cpp(74,11): warning C4244: инициализация: преобразование "long double" в "int", возможна потеря данных
+D:\Учёба\ОАиП\2 сем\6\Mandelbrot\Mandelbrot.cpp(76,11): warning C4244: инициализация: преобразование "long double" в "int", возможна потеря данных
+  Создание кода
+  0 of 2 functions ( 0.0%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    0 functions had inline decision re-evaluated but remain unchanged
+  Создание кода завершено
+  Mandelbrot.vcxproj -> D:\Учёба\ОАиП\2 сем\6\Mandelbrot\x64\Release\Mandelbrot.exe
