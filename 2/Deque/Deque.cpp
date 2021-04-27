@@ -1,49 +1,130 @@
 ﻿#include <iostream> 
 #include <vector>
-#include <deque>
+#include <iterator>
+
 using namespace std;
+
 const int MAX_size = 4;
-// Deque class 
+
 template <typename T>
 class Deque
 {
 private:
     template <typename T>
     struct Block {
-        Block() {
-            this->pPrev = NULL;
-            this->pNext = NULL;
-        }
-        Block(Block<T>* pPrev, Block<T>* pNext) {
-            this->pPrev = pPrev;
-            this->pNext = pNext;
-        }
         T block[MAX_size];
-        Block<T>* pNext;
-        Block<T>* pPrev;
     };
 
     vector<Block<T>*> List;
-    int  front;
-    int  rear;
-    size_t  size;
+    int front;
+    int rear;
+    size_t size;
+
 public:
+    class Iterator : iterator<random_access_iterator_tag, T> {
+    private:
+        Deque<T>* pointer;
+        int index;
+    public:
+        Iterator() {
+            pointer = nullptr;
+        }
+        Iterator(Deque<T>* pointer, int index) {
+            this->pointer = pointer;
+            this->index = index;
+        }
+        T& operator*() {
+            int x = (*pointer)[index];
+            return x;
+        }
+        T& operator*() const {
+            int x = (*pointer)[index];
+            return x;
+        }
+        bool operator==(const Iterator& other) const {
+            return this->index == other.index && this->pointer == other.pointer;
+        }
+        bool operator!=(const Iterator& other) const {
+            return !(this->index == other.index && this->pointer == other.pointer);
+        }
+        bool operator<(const Iterator& other) const {
+            return this->index < other.index;
+        }
+        bool operator>(const Iterator& other) const {
+            return this->index > other.index;
+        }
+        bool operator<=(const Iterator& other) const {
+            return this->index <= other.index;
+        }
+        bool operator>=(const Iterator& other) const {
+            return this->index >= other.index;
+        }
+        Iterator& operator--(T) {
+            auto old = new Iterator(pointer, index);
+            index++;
+            return *old;
+        }
+        Iterator& operator--() {
+            index--;
+            return *this;
+        }
+        Iterator& operator++() {
+            index++;
+            return *this;
+        }
+        Iterator& operator++(T) {
+            auto old = new Iterator(pointer, index);
+            index++;
+            return *old;
+        }
+        Iterator& operator+=(int a) {
+            index += a;
+            return *this;
+        }
+        Iterator& operator-=(int a) {
+            index -= a;
+            return *this;
+        }
+        Iterator& operator-(int a) {
+            auto new_it = new Iterator(pointer, index);
+            new_it->index -= a;
+            return *new_it;
+        }
+        Iterator& operator+(int a) {
+            auto new_it = new Iterator(pointer, index);
+            new_it->index += a;
+            return *new_it;
+        }
+        Iterator& operator=(Iterator& a) {
+            this->pointer = a.pointer;
+            this->index = a.index;
+            return *this;
+        }
+    };
     Deque() {
         Block<T>* block1 = new Block<T>;
-        Block<T>* block2 = new Block<T>(block1, block1);
+        Block<T>* block2 = new Block<T>;
         List.push_back(block1);
         List.push_back(block2);
-        block1->pNext = block2;
-        block1->pPrev = block2;
         size = 0;
-        front = -1;
+        front = 0;
         rear = 0;
+    }
+    ~Deque() {
+        for (int i = 0; i < List.size(); i++) {
+            delete[] List[i];
+        }
+    }
+    T& operator[](int index) {
+        return List[index / MAX_size]->block[index % MAX_size];
     }
     size_t Size() {
         return size;
     }
-    void test() {
-
+    void Clear() {
+        for (int i = 0; i < List.size(); i++) {
+            delete[] List[i];
+        }
     }
     void push_back(T key)
     {
@@ -56,21 +137,17 @@ public:
             rear = 1;
             if (front - rear <= 4) {
                 auto itVec = List.begin();
-                Block<T>* newBlock = new Block<T>(List[List.size() - 1], List[0]->pNext);
-                newBlock->pPrev->pNext = newBlock;
-                newBlock->pNext->pPrev = newBlock;
+                Block<T>* newBlock = new Block<T>();
                 List.insert(itVec, newBlock);
                 front += MAX_size;
             }
             List[0]->block[0] = key;
         }
         else {
-            if (front - 1 - rear <= 4 && front > rear) {
+            if (front / MAX_size == rear / MAX_size && front >= rear) {
                 auto itVec = List.begin();
-                Block<T>* newBlock = new Block<T>(List[front / MAX_size]->pPrev, List[front / MAX_size]);
-                newBlock->pPrev->pNext = newBlock;
-                newBlock->pNext->pPrev = newBlock;
-                itVec += (rear / MAX_size + 1);
+                Block<T>* newBlock = new Block<T>();
+                itVec += (rear / MAX_size);
                 List.insert(itVec, newBlock);
                 front += MAX_size;
             }
@@ -79,66 +156,22 @@ public:
         }
         size++;
     }
-    /*void push_front(T key)
-    {
-        if (size == 0) {
-            front = MAX_size * List.size() - 1;
-            rear = 0;
-            List[List.size() - 1]->block[MAX_size - 1] = key;
-        }
-        else if (front == 0) {
-            front = MAX_size * List.size() - 1;
-            if (front - rear <= 4) {
-                Block<T>* newBlock = new Block<T>(List[(rear - 1) / MAX_size], List[(rear - 1) / MAX_size]->pNext);
-                newBlock->pPrev->pNext = newBlock;
-                newBlock->pNext->pPrev = newBlock;
-                List.push_back(newBlock);
-                front += MAX_size;
-            }
-            List[front / MAX_size]->block[front % MAX_size] = key;
-        }
-        else {
-            if (front - 1 - rear <= 4 && front > rear) {
-                auto itVec = List.begin();
-                Block<T>* newBlock = new Block<T>(List[(rear - 1) / MAX_size], List[(rear - 1) / MAX_size]->pNext);
-                newBlock->pPrev->pNext = newBlock;
-                newBlock->pNext->pPrev = newBlock;
-                itVec += (rear / MAX_size + 1);
-                List.insert(itVec, newBlock);
-                front += MAX_size;
-            }
-            front--;
-            List[front / MAX_size]->block[front % MAX_size] = key;
-        }
-        size++;
-    }*/
     void push_front(T key)
     {
-        front--;
-        if (front<0) {
-            front = MAX_size * List.size() - 1;
-
-            rear = 0;
-            List[List.size() - 1]->block[MAX_size - 1] = key;
-        }
-        else if (front == 0) {
+        if (front == 0) {
             front = MAX_size * List.size() - 1;
             if (front - rear <= 4) {
-                Block<T>* newBlock = new Block<T>(List[(rear - 1) / MAX_size], List[(rear - 1) / MAX_size]->pNext);
-                newBlock->pPrev->pNext = newBlock;
-                newBlock->pNext->pPrev = newBlock;
+                Block<T>* newBlock = new Block<T>();
                 List.push_back(newBlock);
                 front += MAX_size;
             }
             List[front / MAX_size]->block[front % MAX_size] = key;
         }
         else {
-            if (front - 1 - rear <= 4 && front > rear) {
+            if (front / MAX_size == rear / MAX_size && front >= rear) {
                 auto itVec = List.begin();
-                Block<T>* newBlock = new Block<T>(List[(rear - 1) / MAX_size], List[(rear - 1) / MAX_size]->pNext);
-                newBlock->pPrev->pNext = newBlock;
-                newBlock->pNext->pPrev = newBlock;
-                itVec += (rear / MAX_size + 1);
+                Block<T>* newBlock = new Block<T>();
+                itVec += (rear / MAX_size);
                 List.insert(itVec, newBlock);
                 front += MAX_size;
             }
@@ -147,23 +180,56 @@ public:
         }
         size++;
     }
+    void pop_back() {
+        if (size == 0) {
+            exit(-1);
+        }
+        else if (rear == 1) {
+            rear = MAX_size * List.size();
+        }
+        else {
+            rear--;
+        }
+    }
+    void pop_front() {
+        if (size == 0) {
+            exit(-1);
+        }
+        else if (front = MAX_size * List.size() - 1) {
+            front = 0;
+        }
+        else {
+            front++;
+        }
+    }
+    Iterator begin() {
+        return Iterator(this, 0);
+    }
+    Iterator end() {
+        return Iterator(this, size);
+    }
 };
 
 
 
-//main program
 int main()
 {
     Deque<int> dq;
 
-    dq.push_back(12);
-    dq.push_back(13);
-    dq.push_back(14);
-    dq.push_back(15);
-    dq.push_back(16);
-    dq.push_back(17);
-    dq.push_back(18);
-    dq.push_back(19);
+    dq.push_front(12);
+    dq.push_front(13);
+    dq.push_front(14);
+    dq.push_front(15);
+    dq.push_front(16);
+    dq.push_front(17);
+    dq.push_front(18);
+    dq.push_front(19);
+    dq.push_front(20);
+    dq.push_front(21);
+    dq.push_front(22);
+    dq.push_front(23);
+    dq.push_front(24);
+    dq.push_front(25);
     dq.push_front(11);
     dq.push_front(10);
     dq.push_front(9);
@@ -171,5 +237,6 @@ int main()
     dq.push_front(7);
     dq.push_front(6);
     dq.push_front(5);
+    dq.push_back(4);
     return 0;
 }
